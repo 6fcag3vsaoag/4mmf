@@ -1,26 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Параметры задачи (вариант 18)
+# Параметры задачи для ВАРИАНТА 18
 a = 15.0
 b = 10.0
-d = 0.75  # точка излома начального условия
-T = 0.025
-X = 1.0
+c = 27.00
+d = 0.75
+T = 0.025  # Конечное время
+X = 1.0    # Длина отрезка по x
 
 # Параметры сетки
-h = 0.1          # Шаг по x
-tau = 0.005      # Шаг по t
+h = 0.1    # Шаг по x
+tau = 0.005  # Шаг по t
 M = int(X / h) + 1  # Количество узлов по x
 N = int(T / tau) + 1  # Количество узлов по t
 
-# Функция начального условия
+# Функция начального условия для ВАРИАНТА 18
 def y(x):
     if x <= d:
-        return a
+        # Линейная часть от 0 до d: y = ((c - a) / d) * x + a
+        return ((c - a) / d) * x + a
     else:
-        # Линейная интерполяция от (d, a) до (1, b)
-        return a + (b - a) * (x - d) / (1 - d)
+        # Линейная часть от d до 1: y = ((c - b) / (d - 1)) * x + (b * d - c) / (d - 1)
+        return ((c - b) / (d - 1)) * x + (b * d - c) / (d - 1)
 
 # Создание сетки
 x_grid = np.linspace(0, X, M)
@@ -57,29 +59,30 @@ for j in range(N):
         print(f"{u[j, i]:<8.4f}", end="")
     print()
 
-# Оценка погрешности (по разности между последними двумя слоями)
+# Вычисление абсолютной погрешности (сравнение с предыдущим слоем)
 abs_error = np.abs(u[N-1, :] - u[N-2, :])
 
-print("\nТаблица |u(t_final) - u(t_prev)| (оценка погрешности):")
+# Вывод таблицы с погрешностью
+print("\nТаблица |u(t_final) - u(t_final-tau)|:")
 print("-" * 30)
-print(f"{'t':<7}", end="")
-for x in x_grid:
-    print(f"{x:<8.1f}", end="")
+print(f"{'t':<5} {'x':<7}", end="")
+for i in range(M):
+    print(f"{x_grid[i]:<8.1f}", end="")
 print()
 print("-" * 30)
-print(f"{t_grid[N-1]:<7.3f}", end="")
+print(f"{t_grid[N-1]:<7.3f}", end="")  # Print the final time step
 for i in range(M):
-    print(f"{abs_error[i]:<8.4f}", end="")
+     print(f"{abs_error[i]:<8.4f}", end="")  
 print()
 
 # Построение графиков
 plt.figure(figsize=(10, 6))
-for j in range(0, N, max(1, N // 6)):
+for j in range(0, N, max(1, int(N/6)) ):  # Выбираем несколько временных слоев для отображения
     plt.plot(x_grid, u[j, :], label=f't = {t_grid[j]:.3f}')
 
 plt.xlabel('x')
 plt.ylabel('u(x, t)')
-plt.title('Решение уравнения теплопроводности (вариант 18)')
+plt.title('Решение уравнения теплопроводности (Вариант 18)')
 plt.legend()
 plt.grid(True)
 plt.show()
